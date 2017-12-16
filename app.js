@@ -7,9 +7,6 @@ const totp = require('otplib/totp')
 totp.options = { crypto }
 const readline = require('readline')
 
-const salt = 'geras48t'
-const salt2 = 'blkjsd8654t'
-
 function processArgs(){
   const arg = []
   for (let i = 2; i < process.argv.length; i++){
