@@ -1,5 +1,6 @@
 'use strict'
 
+const { Writable } = require('stream')
 const fs = require('fs')
 const crypto = require('crypto')
 const totp = require('otplib/totp')
@@ -40,14 +41,24 @@ function showHelp(){
 }
 
 function getPassword(callback) {
+  let isMuted = false
+  const muteStdin = new Writable({
+    write: (chunk, encoding, callback) => {
+      if (!isMuted)
+        process.stdout.write(chunk, encoding)
+      callback()
+    }
+  })
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: muteStdin,
+    terminal: true
   })
   rl.question('password: ', (password) => {
     rl.close()
     callback(password)
   })
+  isMuted = true
 }
 
 function getNextFileName() {
@@ -61,26 +72,36 @@ function getNextFileName() {
 
 function addKey(generatingKey, label) {
   getPassword(pass => {
+    const salt = crypto.randomBytes(256).toString('base64')
+    const salt2 = crypto.randomBytes(256).toString('base64')
     const key = crypto.pbkdf2Sync(pass, salt, 1000000, 32, 'sha512')
     const iv = crypto.pbkdf2Sync(pass, salt2, 100000, 16, 'sha512')
     const cipher = crypto.createCipheriv('aes-256-ctr', key, iv)
     let enc = cipher.update(`${generatingKey} ${label}`, 'utf8', 'hex')
     enc += cipher.final('hex')
-    fs.writeFileSync(getNextFileName(), enc, 'utf8')
+    const contentToWrite = `${salt}\n${salt2}\n${enc}`
+    fs.writeFileSync(getNextFileName(), contentToWrite, 'utf8')
   })
 }
 
 function showKeys() {
   const files = fs.readdirSync('keys')
     .map((file) => {
-      return [ file, fs.readFileSync('keys/' + file, 'utf8') ];
+      const fileContent = fs.readFileSync('keys/' + file, 'utf8')
+      const salt = fileContent.split('\n')[0]
+      const salt2 = fileContent.split('\n')[1]
+      return [ file, {
+        salt: salt,
+        salt2: salt2,
+        content: fileContent.substring(salt.length + salt2.length + ('\n'.length * 2))
+      }];
     })
   getPassword(pass => {
-    for (const fileContent of files) {
-      const filename = fileContent[0]
-      const content = fileContent[1]
-      const key = crypto.pbkdf2Sync(pass, salt, 1000000, 32, 'sha512')
-      const iv = crypto.pbkdf2Sync(pass, salt2, 100000, 16, 'sha512')
+    for (const file of files) {
+      const filename = file[0]
+      const content = file[1].content
+      const key = crypto.pbkdf2Sync(pass, file[1].salt, 1000000, 32, 'sha512')
+      const iv = crypto.pbkdf2Sync(pass, file[1].salt2, 100000, 16, 'sha512')
       const cipher = crypto.createDecipheriv('aes-256-ctr', key, iv)
       let unenc = cipher.update(content, 'hex', 'utf8')
       unenc += cipher.final('utf8')
