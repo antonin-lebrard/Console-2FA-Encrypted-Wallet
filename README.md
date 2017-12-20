@@ -11,14 +11,11 @@ encrypting them with a password provided by the user
 #### Adding a totp generating key to the catalog:
 
 ```bash
-$> node app.js addKey szsdfo5157zefd1f5sd4857fgsdf84s4 google
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^
-                      the totp generating key          the label to associate with this key
+$> node app.js addKey
+generatingKey: szsdfo5157zefd1f5sd4857fgsdf84s4 # you type the totp generating key here
+label: google # then type the label to associate with this key
+password: # and finaly the password to encrypt with
 ```
-
-
-(Will certainly change the way to add the key, to remove its presence in the bash history, so <b>you might want 
-to not use until properly implemented</b>)
 
 #### Display the pin for every keys added
 
@@ -38,6 +35,7 @@ etc..
 
 ```bash
 $> node app.js changePassword
+password: # password again to decrypt the keys
 ```
 
 It will create a copy of all the already present keys, but encrypted with the new password.
