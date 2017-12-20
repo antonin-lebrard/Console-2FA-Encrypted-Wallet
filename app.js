@@ -14,11 +14,7 @@ function processArgs(){
   if (arg.length === 0) {
     showKeys()
   } else if (arg[0] === 'addKey') {
-    if (!arg[1] || !arg[2]) {
-      showHelp()
-      return
-    }
-    addKey(arg[1], arg[2])
+    addKey()
   } else if (arg[0] === 'changePassword') {
     changePassword()
   } else {
@@ -42,6 +38,30 @@ function showHelp(){
   console.log(' It will ask for your old password, and a new password to decrypt then re-encrypt every files with your new password\n')
   console.log(' As you can not actually trust any code that try to be secured')
   console.log(' You can go see the code here: https://github.com/antonin-lebrard/twoAuthConsoleNode')
+}
+
+function getGeneratingKey(callback) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: true
+  })
+  rl.question('generating key: ', (key) => {
+    rl.close()
+    callback(key)
+  })
+}
+
+function getLabel(callback) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: true
+  })
+  rl.question('label: ', (label) => {
+    rl.close()
+    callback(label)
+  })
 }
 
 function getPassword(callback) {
@@ -102,13 +122,13 @@ function cipherIntoFile(pass, generatingKey, label) {
   return filename
 }
 
-/**
- * @param {String} generatingKey
- * @param {String} label
- */
-function addKey(generatingKey, label) {
-  getPassword(pass => {
-    cipherIntoFile(pass, generatingKey, label)
+function addKey() {
+  getGeneratingKey(key => {
+    getLabel(label => {
+      getPassword(pass => {
+        cipherIntoFile(pass, key, label)
+      })
+    })
   })
 }
 
