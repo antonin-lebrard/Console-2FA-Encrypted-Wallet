@@ -36,6 +36,8 @@ etc..
 
 ```bash
 $> node app.js changePassword
+old password: # old password to decrypt the keys
+new password: # new password to encrypt the keys
 ```
 
 It will create a copy of all the already present keys, but encrypted with the new password.
