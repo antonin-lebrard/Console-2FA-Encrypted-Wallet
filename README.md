@@ -3,7 +3,7 @@
 This is a port to nodejs of the no longer working Dart version here: https://github.com/antonin-lebrard/twoAuthConsole,
 but it is considerably better in security just by actually generating a random IV and salt at each encryption.
 
-This a program to handle a catalog of totp generating keys (like the Google Authenticator app, or FreeOTP for example),
+This is a program to handle a catalog of totp generating keys (like the Google Authenticator app, or FreeOTP for example),
 encrypting them with a password provided by the user
 
 ## Usage 
