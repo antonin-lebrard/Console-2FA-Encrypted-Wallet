@@ -1,4 +1,4 @@
-# twoAuthConsoleNode
+# Console-2FA-Encrypted-Wallet
 
 This is a port to nodejs of the no longer working Dart version here: https://github.com/antonin-lebrard/twoAuthConsole,
 but it is considerably better in security just by actually generating a random IV and salt at each encryption.
