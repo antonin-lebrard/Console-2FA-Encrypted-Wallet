@@ -3,6 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "otplib": "7.0.0"
+    "otp": "0.1.3"
   }
 }
